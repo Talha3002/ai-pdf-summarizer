@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./partials/head') %>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121826;
+            color: #E0E0E0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding-top: 60px; /* to account for fixed navbar */
+        }
+
+        .container {
+            background-color: #1c2233;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #A4C8FF;
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            color: #A0A6B1;
+            font-weight: bold;
+        }
+
+        .form-control {
+            background-color: #2b3248;
+            color: #E0E0E0;
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border: 1px solid #A4C8FF;
+            box-shadow: 0 0 5px rgba(164, 200, 255, 0.5);
+        }
+
+        .form-text {
+            color: #A0A6B1;
+        }
+
+        .btn-primary {
+            background-color: #3A4A69;
+            color: #E0E0E0;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            transition: background-color 0.3s, color 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-primary:hover {
+            background-color: #A4C8FF;
+            color: #121826;
+        }
+
+        .error-message {
+            color: #FF6B6B;
+            background-color: #3A4A69;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('./partials/nav') %>
+
+    <div class="container">
+        <h1>Create an Account</h1>
+        <form id="signupForm" action="/user/signup" method="post">
+            <div class="mb-3">
+                <label for="fullName" class="form-label">Name</label>
+                <input type="text" class="form-control" id="fullName" name="fullName" placeholder="Enter your full name">
+            </div>
+            <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="exampleInputEmail1" name="email" placeholder="Enter your email">
+                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+            </div>
+            <div class="mb-3">
+                <label for="exampleInputPassword1" class="form-label">Password</label>
+                <input type="password" class="form-control" id="exampleInputPassword1" name="Password"
+                    placeholder="Enter your password">
+            </div>
+            <div id="error-container"></div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+    <%- include('./partials/script') %>
+
+    <script>
+        const form = document.querySelector('#signupForm');
+        const password = document.querySelector('#exampleInputPassword1');
+        const errorContainer = document.querySelector('#error-container');
+
+        form.addEventListener('submit', function (event) {
+            // Clear previous error message
+            errorContainer.innerHTML = '';
+
+            if (password.value.length < 6) {
+                event.preventDefault(); // Prevent form submission
+
+                // Create and display error message
+                const errorMessage = document.createElement('div');
+                errorMessage.classList.add('error-message');
+                errorMessage.innerHTML = '<p>Password has to be at least 6 characters long.</p>';
+                errorContainer.appendChild(errorMessage);
+            }
+        });
+    </script>
+</body>
+
+</html>

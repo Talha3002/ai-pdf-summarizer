@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Summarizer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* General Styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            height: 100vh;
+            background-color: #121826;
+            color: #E0E0E0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .profile {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            background-color: #1F2A3B;
+            padding: 10px;
+            border-radius: 15px;
+            color: #A0A6B1;
+            cursor: pointer;
+        }
+
+        .profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .username {
+            font-size: 16px;
+            font-weight: bold;
+            color: #E0E0E0;
+        }
+
+        /* Container for PDF Upload Section */
+        .pdf-container {
+            width: 80%;
+            position: relative;
+            left: 60px;
+            max-width: 900px;
+            background-color: #1B263B;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        /* Left Section: Upload and Controls */
+        .upload-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .file-upload-box {
+            padding: 15px;
+            background-color: #27324A;
+            border: 2px dashed #39495E;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            color: #B0BAC8;
+            font-size: 16px;
+        }
+
+        .file-upload-box:hover {
+            border-color: lightblue;
+            color: lightblue;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        label {
+            font-size: 14px;
+            color: #A4C8FF;
+        }
+
+        select,
+        button {
+            padding: 10px;
+            background-color: #3A4A69;
+            color: #E0E0E0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        select:hover,
+        button:hover {
+            border: 1px solid lightblue;
+            color: lightblue;
+        }
+
+        /* Right Section: Summary Output */
+        .summary-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            background-color: #1F2A3B;
+            color: #E0E0E0;
+            border: 1px solid #39495E;
+            border-radius: 8px;
+            resize: none;
+            font-size: 14px;
+        }
+
+        textarea:focus {
+            border-color: lightblue;
+            outline: none;
+        }
+ /* Profile Section Styling */
+ .dropdown {
+            display: none;
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            background-color: #27324A;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            padding: 10px 0;
+            width: 180px;
+            z-index: 10;
+            text-align: center;
+            /* Centers the links */
+            transform: scale(0.9);
+            transition: transform 0.2s ease;
+        }
+
+        .dropdown a {
+            display: block;
+            padding: 12px 0;
+            /* Add top and bottom padding for more spacing */
+            color: #A0A6B1;
+            text-decoration: none;
+            font-size: 14px;
+            border-bottom: 1px solid #39495E;
+            /* Add a subtle border between options */
+        }
+
+        .dropdown a:last-child {
+            border-bottom: none;
+            /* Remove border from the last item */
+        }
+
+        .dropdown a:hover {
+            background-color: #3A4A69;
+            color: lightblue;
+            border-radius: 4px;
+        }
+
+        .dropdown.show {
+            display: block;
+            transform: scale(1);
+            /* Animation effect on opening */
+        }
+
+
+         /* Popup Form Styling */
+         .popup-form {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            /* Semi-transparent background */
+            display: none;
+            /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .popup-content {
+            background-color: #1B263B;
+            padding: 20px 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            width: 400px;
+            max-width: 90%;
+            color: #E0E0E0;
+        }
+
+        .popup-content h2 {
+            margin-bottom: 20px;
+            color: #A4C8FF;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #A0A6B1;
+        }
+
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #27324A;
+            color: #E0E0E0;
+            border: 1px solid #39495E;
+        }
+
+        .btn-submit {
+            background-color: #3A4A69;
+            color: #E0E0E0;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        
+
+        .btn-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            color: #A0A6B1;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .btn-close:hover {
+            color: lightblue;
+        }
+
+        .auth-links {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            background-color: #1F2A3B;
+            padding: 10px;
+            border-radius: 15px;
+            color: #A0A6B1;
+            cursor: pointer;
+        }
+
+        .auth-links a {
+            margin: 0 5px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            color: #E0E0E0;
+        }
+
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
+/* Sidebar Styling */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -250px; /* Hidden by default */
+    width: 250px;
+    height: 100%;
+    background-color: #1B263B;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    transition: left 0.3s ease-in-out;
+    z-index: 1000;
+    color: #E0E0E0;
+}
+
+.sidebar h3 {
+    margin-top: 0;
+    color: lightblue;
+    border-bottom: 1px solid #39495E;
+    padding-bottom: 10px;
+}
+.sidebar a {
+    margin-top: 0;
+    color: lightblue;
+    border-bottom: 1px solid #39495E;
+    padding-bottom: 10px;
+    text-decoration: none;
+}
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    padding: 10px 0;
+    border-bottom: 1px solid #39495E;
+}
+
+.sidebar ul li:hover {
+    color: lightblue;
+    cursor: pointer;
+}
+
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+    position: fixed;
+    top: 50%;
+    left: 10px;
+    background-color: #27324A;
+    color: #A0A6B1;
+    border-radius: 50%;
+    padding: 10px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.sidebar-toggle i {
+    font-size: 20px;
+}
+
+.sidebar-toggle:hover {
+    background-color: lightblue;
+    color: #1B263B;
+}
+
+        /* Responsive Styling */
+        @media (max-width: 768px) {
+            .pdf-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<!-- Sidebar and Toggle Button -->
+
+    <% if (locals.user) { %>
+        <div id="sidebar" class="sidebar">
+            <h3>Summary History</h3>
+            <ul id="summary-history">
+                <!-- Dynamically display previously generated summaries -->
+                <% if (summaries && summaries.length > 0) { %>
+                    <% summaries.forEach(summary => { %>
+                        <li>
+                            <a href="/user/summary/<%= summary._id %>">
+                                <%= summary.pdfName %> <!-- Display the name of the PDF -->
+                            </a>
+                        </li>
+                    <% }); %>
+                <% } else { %>
+                    <li>No summaries found.</li>
+                <% } %>
+            </ul>
+        </div>
+        <div id="sidebar-toggle" class="sidebar-toggle">
+            <i class="fas fa-chevron-right"></i>
+        </div>
+    <% } %>
+
+    
+     <!-- Profile Section -->
+     <% if (locals.user) { %>
+        <div class="profile">
+            <img src="<%= images.coverImageURL %>" id="profile-pic" alt="Profile Picture">
+            <div class="username">
+                <%= user.fullName %>
+            </div>
+        </div>
+
+        <div class="dropdown" id="dropdown-menu">
+            <a href="/user/logout">Logout</a>
+            <a href="/user/deletepic">Delete Pic</a>
+        </div>
+        <% } else { %>
+            <div class="auth-links">
+                <a href="/user/signup" class="btn btn-primary">Sign Up /</a>
+                <a href="/user/signin" class="btn btn-secondary">Sign In</a>
+            </div>
+            <% } %>
+
+            <!-- PDF Upload and Summary Section -->
+  <div class="pdf-container">
+    <!-- Left: PDF Upload Section -->
+    <div class="upload-section">
+        <form action="/user/chatwithpdf" method="post" enctype="multipart/form-data">
+            <label for="fileUpload">Upload PDF File</label>
+            <div class="file-upload-box" onclick="document.getElementById('fileUpload').click();">
+                <i class="fas fa-upload"></i> Click to Upload PDF
+            </div>
+            <input type="file" id="fileUpload" name="pdf" accept=".pdf">
+
+            <label for="summaryLength" style="position:relative; top: 2rem;">Select Summary Length</label>
+            <select id="summaryLength" name="summaryLength" style="position:relative; top: 2rem;">
+                <option value="short">Short</option>
+                <option value="medium">Medium</option>
+                <option value="long">Long</option>
+            </select>
+
+            <button type="submit" class="btn-submit" style="position:relative; top: 2rem;">Generate Summary</button>
+        </form>
+        <button id="clearButton" class="btn-clear" style="position: relative; top: 50px;" onclick="clearSummary()">Clear Summary</button>
+    </div>
+
+    <!-- Right: Summary Output -->
+    <div class="summary-section">
+        <label for="summaryOutput">Generated Summary</label>
+        <textarea id="summaryOutput" placeholder="Your summary will appear here..." readonly><%= summary %></textarea>
+    </div>
+</div>
+
+<!-- Profile Picture Upload Section -->
+<div id="profile-form-popup" class="popup-form">
+    <div class="popup-content">
+        <h2>Change Picture</h2>
+        <form action="/user/chatwithpdf" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="coverImage">Upload New Profile Picture</label>
+                <input type="file" id="coverImage" name="coverImage" accept="image/*">
+            </div>
+            <button type="submit" class="btn-submit">Submit</button>
+        </form>
+        <button class="btn-close">&times;</button>
+    </div>
+</div>
+    <script>
+         // Dropdown menu toggle
+    const profilePic = document.getElementById('profile-pic');
+    const username = document.querySelector('.username');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+    const profileFormPopup = document.getElementById('profile-form-popup');
+    const closePopupButton = document.querySelector('.btn-close');
+// Sidebar Toggle Functionality
+const sidebar = document.getElementById('sidebar');
+const sidebarToggle = document.getElementById('sidebar-toggle');
+let sidebarVisible = false;
+
+sidebarToggle.addEventListener('click', () => {
+    sidebarVisible = !sidebarVisible;
+
+    if (sidebarVisible) {
+        sidebar.style.left = '0'; // Show sidebar
+        sidebarToggle.innerHTML = '<i class="fas fa-chevron-left"></i>'; // Change to left arrow
+    } else {
+        sidebar.style.left = '-250px'; // Hide sidebar
+        sidebarToggle.innerHTML = '<i class="fas fa-chevron-right"></i>'; // Change back to right arrow
+    }
+});
+
+    // Show dropdown when clicking on the username
+    username.addEventListener('click', (e) => {
+        dropdownMenu.classList.toggle('show'); // Toggle the dropdown visibility
+        e.stopPropagation(); // Prevent body click event from closing immediately
+    });
+
+    // Open popup form when clicking on the profile picture
+    profilePic.addEventListener('click', (e) => {
+        profileFormPopup.style.display = 'flex'; // Show the popup form
+        e.stopPropagation();
+    });
+
+    // Close popup form when clicking the close button
+    closePopupButton.addEventListener('click', () => {
+        profileFormPopup.style.display = 'none'; // Hide the popup form
+    });
+
+    // Close dropdown or popup when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!dropdownMenu.contains(e.target) && !username.contains(e.target)) {
+            dropdownMenu.classList.remove('show');
+        }
+        if (!profileFormPopup.contains(e.target) && e.target !== profilePic) {
+            profileFormPopup.style.display = 'none';
+        }
+    });
+
+        function generateSummary() {
+            const fileInput = document.getElementById('fileUpload');
+            const summaryLength = document.getElementById('summaryLength').value;
+            const summaryOutput = document.getElementById('summaryOutput');
+
+            if (fileInput.files.length === 0) {
+                alert('Please upload a PDF file.');
+                return;
+            }
+
+            const fileName = fileInput.files[0].name;
+            summaryOutput.value = `Generating a ${summaryLength} summary for ${fileName}...\n\n(Processing logic placeholder...)`;
+        }
+        function clearSummary() {
+    // Clear the content of the summary output textarea
+    document.getElementById("summaryOutput").value = "";
+}
+    </script>
+</body>
+
+</html>
